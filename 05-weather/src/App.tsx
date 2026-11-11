@@ -7,17 +7,22 @@ import { getCurrentWeather } from "./services/OWMAPI";
 import type { CurrentWeatherData } from "./services/OWMAPI.types";
 import "./assets/scss/App.scss";
 import LoadingWeather from "./components/LoadingWeather";
+import { useCurrentWeather } from "./hooks/useCurrentWeather";
+
 
 function App() {
+	const { data: currentWeatherData, isLoading, isError } = useCurrentWeather("Stockholm");
+
+
 	const [currentWeather, setCurrentWeather] = useState<CurrentWeatherData | null>(null);
-	const [error, setError] = useState<string | null>(null);
-	const [isLoading, setIsLoading] = useState(false);
+
 
 	const handleSearch = async (location: string) => {
 		// Reset state
 		setCurrentWeather(null);
-		setError(null);
-		setIsLoading(true);
+		// Reset error
+		// setError(null);
+		//setIsLoading(true);
 
 		try {
 			// Call API and get current weather at `location`
@@ -28,12 +33,15 @@ function App() {
 
 		} catch (err) {
 			if (err instanceof Error) {
-				setError(err.message);
+				{isError && <Alert variant="danger">{isError}</Alert>}
+				//setError(err.message);
 			} else {
-				setError("This should never happen...");
+				//setError("An unknown error occurred");
+				{isError && <Alert variant="danger">{isError}</Alert>}
+				// setError("This should never happen...");
 			}
 		} finally {
-			setIsLoading(false);
+			isLoading(false);
 		}
 	}
 
@@ -45,7 +53,7 @@ function App() {
 
 			<SearchCity isLoading={isLoading} onSearch={handleSearch} />
 
-			{error && <Alert variant="danger">{error}</Alert>}
+			{isError && <Alert variant="danger">{isError}</Alert>}
 
 			{isLoading && <LoadingWeather />}
 
